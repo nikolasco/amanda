@@ -48,7 +48,6 @@ typedef struct XferSourceHolding {
     int fd;
     char *next_filename;
 
-    gboolean send_cache_inform;
     XferElement *dest_taper;
 } XferSourceHolding;
 
@@ -98,7 +97,7 @@ start_new_chunk(
     }
 
     /* tell a XferDestTaper about the new file */
-    if (self->send_cache_inform) {
+    if (self->dest_taper) {
 	struct stat st;
 	if (fstat(self->fd, &st) < 0) {
 	    xfer_element_handle_error(XFER_ELEMENT(self),
@@ -198,18 +197,15 @@ start_impl(
 {
     XferSourceHolding *self = (XferSourceHolding *)elt;
 
-    if (self->send_cache_inform) {
-	/* the xfer may have inserted glue between this element and
-	 * the XferDestTaper. Glue does not change the bytestream, so
-	 * it does not interfere with cache_inform calls. */
-	XferElement *iter = elt->downstream;
-	while (iter && IS_XFER_ELEMENT_GLUE(iter)) {
-	    iter = iter->downstream;
-	}
-	g_assert(IS_XFER_DEST_TAPER(iter));
-
-	self->dest_taper = iter;
+    /* the xfer may have inserted glue between this element and
+     * the XferDestTaper. Glue does not change the bytestream, so
+     * it does not interfere with cache_inform calls. */
+    XferElement *iter = elt->downstream;
+    while (iter && IS_XFER_ELEMENT_GLUE(iter)) {
+        iter = iter->downstream;
     }
+    if (IS_XFER_DEST_TAPER(iter))
+	self->dest_taper = iter;
 
     return FALSE;
 }
@@ -289,14 +285,12 @@ xfer_source_holding_get_type (void)
 /* create an element of this class; prototype is in xfer-element.h */
 XferElement *
 xfer_source_holding(
-    const char *filename,
-    gboolean send_cache_inform)
+    const char *filename)
 {
     XferSourceHolding *self = (XferSourceHolding *)g_object_new(XFER_SOURCE_HOLDING_TYPE, NULL);
     XferElement *elt = XFER_ELEMENT(self);
 
     self->next_filename = g_strdup(filename);
-    self->send_cache_inform = send_cache_inform;
 
     return elt;
 }

@@ -282,7 +282,7 @@ test_taper_dest(
 # set up a few holding chunks and read from those
 $holding_file = make_holding_files(3);
 test_taper_dest(
-    Amanda::Xfer::Source::Holding->new($holding_file, 1),
+    Amanda::Xfer::Source::Holding->new($holding_file),
     Amanda::Xfer::Dest::Taper->new(128*1024, 1024*1024, 0, undef),
     [ "PART-1-OK", "PART-2-OK", "PART-3-FAILED",
       "PART-3-OK", "PART-4-OK", "PART-5-FAILED",

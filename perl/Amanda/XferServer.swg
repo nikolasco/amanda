@@ -60,8 +60,7 @@ XferElement *xfer_dest_taper(
 
 %newobject xfer_source_holding;
 XferElement * xfer_source_holding(
-    const char *filename,
-    gboolean send_cache_inform);
+    const char *filename);
 
 void xfer_dest_taper_start_part(
     XferElement *self,

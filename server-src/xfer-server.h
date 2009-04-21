@@ -34,8 +34,7 @@
  * @return: new element
  */
 XferElement *xfer_source_holding(
-    const char *filename,
-    gboolean send_cache_inform);
+    const char *filename);
 
 
 #endif
