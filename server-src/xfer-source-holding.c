@@ -199,9 +199,16 @@ start_impl(
     XferSourceHolding *self = (XferSourceHolding *)elt;
 
     if (self->send_cache_inform) {
-	GPtrArray *elements = elt->xfer->elements;
-	self->dest_taper = (XferElement *)g_ptr_array_index(elements, elements->len - 1);
-	g_assert(IS_XFER_DEST_TAPER(self->dest_taper));
+	/* the xfer may have inserted glue between this element and
+	 * the XferDestTaper. Glue does not change the bytestream, so
+	 * it does not interfere with cache_inform calls. */
+	XferElement *iter = elt->downstream;
+	while (iter && IS_XFER_ELEMENT_GLUE(iter)) {
+	    iter = iter->downstream;
+	}
+	g_assert(IS_XFER_DEST_TAPER(iter));
+
+	self->dest_taper = iter;
     }
 
     return FALSE;

@@ -138,12 +138,14 @@ not close the descriptor.  Be careful not to let Perl close the file for you!
 
 =head3 Amanda::Xfer::Source::Holding (SERVER-ONLY)
 
-  Amanda::Xfer::Source::Holding->new($filename);
+  Amanda::Xfer::Source::Holding->new($filename, $send_cache_inform);
 
-This source reads data from a holding file (see L<Amanda::Holding>).  If the
-element downstream is an C<Amanda::Xfer::Dest::Taper>, then it will call that
-object's C<cache_inform> method so that it can use holding chunks for a
-split-part cache.
+This source reads data from a holding file (see L<Amanda::Holding>).  If
+C<$send_cache_inform> is true, then the source will call the destination's
+C<cache_inform> method so that it can use holding chunks for a split-part
+cache.  To use this technique, the transfer I<must> be restricted to an
+C<Amanda::Xfer::Source::Holding> and an C<Amanda::Xfer::Dest::Taper>.  No
+filters are supported.
 
 =head3 Amanda::Xfer::Source::Random
 
