@@ -87,10 +87,11 @@ sub new {
     my ($class, $fh) = @_;
     # save the underlying filehandle
     my $o = {'fh' => $fh};
+    # must bless before tie()
+    bless($o, $class);
     # note that gensym is needed so we have something to tie()
     my $new_fh = gensym;
     tie(*$new_fh, $class, $o);
-    bless($o, $class);
     # note that the anonymous glob reference must be returned, so
     # when 'print $fh "some string"' is used it works
     return $new_fh;
@@ -98,7 +99,6 @@ sub new {
 
 sub TIEHANDLE {
     my ($class, $o) = @_;
-    bless($o, $class);
     return $o;
 }
 
